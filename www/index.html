@@ -563,7 +563,7 @@ function ownerProducts(){
     '<div class="field"><label for="np-price">Price (₹)</label><input id="np-price" type="number" inputmode="numeric" min="1" step="1"></div></div>'+
     '<div><button class="btn btn-primary" type="submit">Add product</button></div></form>';
   h += '<div class="stack">';
-  D.products.forEach(function(p){
+  D.products.forEach(function(p){ 
     h += '<article class="pedit"><div class="pthumb"><div class="thumbbig">'+pic(p)+'</div><label class="btn btn-quiet btn-sm filebtn">Change photo<input class="sr" type="file" accept="image/*" data-pid="'+esc(p.id)+'" data-field="photo"></label><span class="muted small">Square photos look best.</span></div>'+
       '<div class="pfields"><div class="field"><label for="pn-'+esc(p.id)+'">Name</label><input id="pn-'+esc(p.id)+'" data-pid="'+esc(p.id)+'" data-field="name" value="'+esc(p.name)+'"></div>'+
       '<div class="field"><label for="pd-'+esc(p.id)+'">Description</label><textarea id="pd-'+esc(p.id)+'" rows="2" data-pid="'+esc(p.id)+'" data-field="desc">'+esc(p.desc)+'</textarea></div>'+
