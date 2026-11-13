@@ -126,7 +126,7 @@ main{padding-top:20px;min-height:60vh}
 .thumb{width:72px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
 .lname{font-weight:600}
 .lctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
-.linkbtn{font:inherit;background:none;border:0;padding:4px 0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:13px}
+.linkbtn{font:inherit;background:none;border:0;padding:8px 4px;min-height:36px;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:13px}
 .row{display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-variant-numeric:tabular-nums}
 .row.total{border-top:1px solid var(--line);margin-top:8px;padding-top:12px;font-weight:700;font-size:18px}
 .empty{padding:40px 16px;text-align:center;background:var(--surface);border:1px dashed var(--line);border-radius:var(--radius);display:flex;flex-direction:column;gap:12px;align-items:center}
@@ -451,7 +451,7 @@ function viewCheckout(){
   h += '<div class="two"><form id="checkout-form" class="form-stack" novalidate>';
   h += '<div class="panel"><h2>Delivery details</h2><div class="fgrid">'+
     fld('name','Full name',{span:true,ac:'name'})+
-    fld('phone','Mobile number',{type:'tel',ac:'tel',mode:'numeric',max:'14'})+
+    fld('phone','Mobile number',{type:'tel',ac:'tel',mode:'tel',max:'18'})+
     fld('email','Email',{type:'email',ac:'email'})+
     fld('a1','Address line 1',{span:true,ac:'address-line1'})+
     fld('a2','Address line 2 (optional)',{span:true,ac:'address-line2'})+
@@ -481,6 +481,7 @@ function findOrder(q){
 
 function viewDone(){
   var o = S.lastOrderId ? findOrder(S.lastOrderId) : null;
+  if(!o) o = D.orders.filter(function(x){ return !x.sample; })[0] || null;
   if(!o) return '<div class="empty"><p>There is no recent order to show.</p><a class="btn btn-primary" href="#shop">Back to the shop</a></div>';
   return '<div class="panel stack" style="max-width:640px">'+
     '<div class="okmark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"/></svg></div>'+
@@ -645,7 +646,7 @@ function finishOrder(){
   if(!lines.length){ go('shop'); return; }
   var t = totals(lines), f = S.form, num = D.nextOrder++;
   var o = {id:'AB-'+num, sample:false,
-    customer:{name:f.name.trim(), phone:f.phone.replace(/[\s-]/g,''), email:f.email.trim(), a1:f.a1.trim(), a2:f.a2.trim(), city:f.city.trim(), state:f.state, pin:f.pin.trim()},
+    customer:{name:f.name.trim(), phone:normPhone(f.phone), email:f.email.trim(), a1:f.a1.trim(), a2:f.a2.trim(), city:f.city.trim(), state:f.state, pin:f.pin.trim()},
     items:lines.map(function(l){ return {id:l.id, name:l.name, price:l.price, qty:l.qty}; }),
     subtotal:t.sub, delivery:t.del, total:t.total, method:S.payMethod === 'upi' ? 'UPI' : 'Card', status:'placed', log:{placed:Date.now()}, awb:null};
   D.orders.unshift(o); cart = {}; save();
@@ -654,10 +655,17 @@ function finishOrder(){
 }
 
 /* ---------- checkout validation ---------- */
+function normPhone(s){
+  s = String(s || '').replace(/[\s-]/g, '');
+  if(/^\+91\d{10}$/.test(s)) return s.slice(3);
+  if(/^91\d{10}$/.test(s)) return s.slice(2);
+  if(/^0\d{10}$/.test(s)) return s.slice(1);
+  return s;
+}
 function validate(){
   var f = S.form, e = {};
   if(!f.name.trim()) e.name = 'Enter your full name.';
-  if(!/^[6-9]\d{9}$/.test(f.phone.replace(/[\s-]/g,''))) e.phone = 'Enter a 10-digit mobile number.';
+  if(!/^[6-9]\d{9}$/.test(normPhone(f.phone))) e.phone = 'Enter a 10-digit mobile number.';
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) e.email = 'Enter a valid email address.';
   if(!f.a1.trim()) e.a1 = 'Enter your address.';
   if(!f.city.trim()) e.city = 'Enter your city.';
@@ -783,7 +791,7 @@ document.addEventListener('keydown', function(e){
   }
 });
 
-window.addEventListener('hashchange', function(){ render(); window.scrollTo(0, 0); });
+window.addEventListener('hashchange', function(){ S.armReset = false; S.armRm = null; render(); window.scrollTo(0, 0); });
 
 load();
 render();
