@@ -8,6 +8,8 @@
 <body>
 <title>Abisum Shop</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="app-version" content="1.1">
+<meta name="app-build-date" content="13 Nov 2026">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500..800&family=Inter:wght@400;500;600&display=swap">
 <style>
 /* Layout: sticky header over one centred column. Shop is a product grid, checkout is form plus summary, owner area is status-led lists. */
@@ -224,7 +226,7 @@ footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);color:v
     <a class="cartbtn" href="#cart" data-nav="cart" aria-label="Cart">Cart <span class="count" id="cart-count">0</span></a>
   </header>
   <main id="main"></main>
-  <footer>Abisum is a working name for this demo. Delivery is a flat ₹30 per order.</footer>
+  <footer>Abisum is a working name for this demo. Delivery is a flat ₹30 per order.<br><span id="build-label"></span></footer>
 </div>
 <div id="sheet-root"></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -793,6 +795,10 @@ document.addEventListener('keydown', function(e){
 
 window.addEventListener('hashchange', function(){ S.armReset = false; S.armRm = null; render(); window.scrollTo(0, 0); });
 
+(function(){
+  var v = document.querySelector('meta[name="app-version"]'), d = document.querySelector('meta[name="app-build-date"]'), el = document.getElementById('build-label');
+  if(el) el.textContent = 'Demo build v' + (v ? v.content : '?') + (d ? ' · ' + d.content : '');
+})();
 load();
 render();
 })();
