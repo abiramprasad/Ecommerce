@@ -29,6 +29,12 @@ jobs:
           npx capacitor-assets generate --android
           npx cap sync android
 
+      - name: Set the app version
+        run: |
+          VERSION=$(grep -o 'name="app-version" content="[^"]*"' www/index.html | sed 's/.*content="//; s/"$//')
+          VERSION=${VERSION:-1.0}
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"$VERSION\"/" android/app/build.gradle
+
       - name: Build the APK
         working-directory: android
         run: ./gradlew assembleDebug
